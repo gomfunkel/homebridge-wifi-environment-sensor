@@ -2,11 +2,11 @@
 
 This repository contains all code for my custom made [Apple HomeKit](https://www.apple.com/ios/home/) compatible WiFi environment sensor using a NodeMCU board and the BME280 sensor. It includes the [ESP8266 code](#client), the [Homebridge plugin](#plugin) to allow it to be used in HomeKit and a [webservice](#server) in Node.js used to store and manage sensor data.
 
-A detailed description of the project will soon(ish) be available on my [website](http://daniel.leinich.io), stay tuned.
+A more detailed description of the whole project can be found on my [website](http://daniel.leinich.io/blog/diy-wifi-environment-sensor). The blog post is only available in German right now. If you are not able to read German you might have some luck asking our future KI overlords for a [translation](https://translate.google.com/).
 
 ## Client
 
-The client code is merely an .INO file you can load into [Arduino IDE](https://www.arduino.cc/en/main/software) and deploy to your NodeMCU/ESP8266. You will also need the [ESP8266 Arduino core](https://github.com/esp8266/Arduino) to enable ESP8266 support in the Arduino environment. On top of that the code is using the [Adafruit Unified Sensor Driver](https://github.com/adafruit/Adafruit_Sensor) and the [Adafruit BME 280 Library](https://github.com/adafruit/Adafruit_BME280_Library). The blog post mentioned above will contain further details on how everything is set up, especially the corresponding hardware, but what the code basically does is:
+The client code is merely an .INO file you can load into [Arduino IDE](https://www.arduino.cc/en/main/software) and deploy to your NodeMCU/ESP8266. You will also need the [ESP8266 Arduino core](https://github.com/esp8266/Arduino) to enable ESP8266 support in the Arduino environment. On top of that the code is using the [Adafruit Unified Sensor Driver](https://github.com/adafruit/Adafruit_Sensor) and the [Adafruit BME 280 Library](https://github.com/adafruit/Adafruit_BME280_Library). The blog post mentioned above contains further details on how everything is set up, especially the corresponding hardware, but what the code basically does is:
 
 1. Connect to a given WiFi
 2. Get sensor data from the BME280
