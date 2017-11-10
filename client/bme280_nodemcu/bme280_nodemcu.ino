@@ -56,16 +56,20 @@ void setup () {
   Serial.print("This device's MAC address is ");
   Serial.println(WiFi.macAddress());
 
-  // Check for BME280 availability
+  // Check for BME280 availability and initialize it if found
   if (!bme.begin()) {
     Serial.println();
     Serial.println("ERROR: Could not find BME280 sensor, check wiring");
     while (1);
+  } else {
+    bme.setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF, Adafruit_BME280::STANDBY_MS_1000);
   }
 
   delay(1000);
 
   // Get data from the sensor
+  bme.takeForcedMeasurement();
+
   t = bme.readTemperature();
   h = bme.readHumidity();
   p = bme.readPressure() / 100.0F;
