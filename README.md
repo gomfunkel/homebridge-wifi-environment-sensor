@@ -2,7 +2,7 @@
 
 This repository contains all code for my custom made [Apple HomeKit](https://www.apple.com/ios/home/) compatible WiFi environment sensor using a NodeMCU board and the BME280 sensor. It includes the [ESP8266 code](#client), the [Homebridge plugin](#plugin) to allow it to be used in HomeKit and a [webservice](#server) in Node.js used to store and manage sensor data.
 
-A more detailed description of the whole project can be found on my [website](http://daniel.leinich.io/blog/diy-wifi-environment-sensor). The blog post is only available in German right now. If you are not able to read German you might have some luck asking our future KI overlords for a [translation](https://translate.google.com/).
+A more detailed description of the whole project can be found on my [website](http://daniel.leinich.io/blog/diy-wifi-environment-sensor). The blog post is only available in German right now. If you are not able to read German you might have some luck asking our future AI overlords for a [translation](https://translate.google.com/).
 
 ## Client
 
