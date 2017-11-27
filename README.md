@@ -27,6 +27,10 @@ Expects a POST request with Content-Type `application/x-www-form-urlencoded` and
 
 Gets the latest sensor data for the specified `deviceId` from the database and returns a JSON representation of it. This is primarily called by the [plugin](#plugin).
 
+`GET /data/all/{deviceId}`
+
+Gets all sensor data for the specified `deviceId` from the database and returns a JSON representation of it. Using the optional GET parameter `callback` a function name to wrap the response payload can be provided, this can for example be used by JSONP requests.
+
 `DELETE /data/{deviceId}`
 
 Deletes all stored data for the given `deviceId` from the database.

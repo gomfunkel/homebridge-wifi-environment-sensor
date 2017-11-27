@@ -101,6 +101,56 @@ function getLatestData (deviceId, res) {
 }
 
 /**
+ * Get all sensor data for a given device from the table.
+ *
+ * @param deviceId        Unique ID of the device to get data for
+ * @param [jsonpCallback] Function name for a JSONP callback
+ * @param res             Response object for the HTTP request
+ */
+function getAllData (deviceId, jsonpCallback, res) {
+
+  // If there are only two parameters, assume that there is no JSONP callback
+  // and the second one being the response object
+  if (res === undefined) {
+    res = jsonpCallback;
+    jsonpCallback = false;
+  }
+
+  db.all("SELECT * FROM "+tableName+" WHERE deviceId='"+deviceId+"' ORDER BY timestamp DESC", function (error, result) {
+
+    if (error) {
+      console.log(getLogTimestamp()+'ERROR: Unable to get sensor data from database');
+      res.status(500).send({});
+    } else if (result === undefined) {
+      console.log(getLogTimestamp()+'ERROR: Could not find any sensor data for the given device');
+      res.status(500).send({});
+    } else {
+      console.log(getLogTimestamp()+'INFO: Delivering requested sensor data to client');
+
+      var resultsToDeliver = [];
+      for (var i = 0; i < result.length; i++) {
+        resultsToDeliver.push({
+          'deviceId': result[i].deviceid,
+          'timestamp': result[i].timestamp,
+          'temperature': result[i].temperature,
+          'humidity': result[i].humidity,
+          'pressure': result[i].pressure
+        });
+      }
+
+      if (jsonpCallback) {
+        res.status(200).send(jsonpCallback + '(' + JSON.stringify({ 'count': resultsToDeliver.length, 'results': resultsToDeliver }) + ')');
+      } else {
+        res.status(200).send({ 'count': resultsToDeliver.length, 'results': resultsToDeliver });
+      }
+
+    }
+
+  });
+
+}
+
+/**
  * Delete sensor data for a given device from the table.
  */
 function deleteData (deviceId, res) {
@@ -135,13 +185,27 @@ app.post('/data', function (req, res) {
 
 });
 
-// Express route to get sensor data for a given device
+// Express route to get the latest sensor data for a given device
 app.get('/data/latest/:deviceId', function (req, res) {
 
-  console.log(getLogTimestamp()+'INFO: Sensor data for device '+req.params.deviceId+' requested');
+  console.log(getLogTimestamp()+'INFO: Latest sensor data for device '+req.params.deviceId+' requested');
 
   // Get data for the given device from the database
   getLatestData(req.params.deviceId, res);
+
+});
+
+// Express route to get all sensor data for a given device
+app.get('/data/all/:deviceId', function (req, res) {
+
+  console.log(getLogTimestamp()+'INFO: All sensor data for device '+req.params.deviceId+' requested');
+
+  // Get data for the given device from the database
+  if (req.query.callback) {
+    getAllData(req.params.deviceId, req.query.callback, res);
+  } else {
+    getAllData(req.params.deviceId, res);
+  }
 
 });
 
