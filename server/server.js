@@ -90,8 +90,9 @@ function insertData (deviceId, temperature, humidity, pressure) {
  *
  * @param deviceId Unique ID of the device to get data for
  * @param res      Response object for the HTTP request
+ * @param [jsonpCallback] Function name for a JSONP callback
  */
-function getLatestData (deviceId, res) {
+function getLatestData (deviceId, res, jsonpCallback) {
 
   db.get("SELECT * FROM "+tableName+" WHERE deviceId='"+deviceId+"' ORDER BY timestamp DESC LIMIT 1", function (error, row) {
 
@@ -103,13 +104,21 @@ function getLatestData (deviceId, res) {
       res.status(500).send({});
     } else {
       console.log(getLogTimestamp()+'INFO: Delivering requested sensor data to client');
-      res.status(200).send({
+
+      var resultToDeliver = {
         'deviceId': row.deviceid,
         'timestamp': row.timestamp,
         'temperature': row.temperature,
         'humidity': row.humidity,
         'pressure': row.pressure
-      });
+      };
+
+      if (jsonpCallback) {
+        res.status(200).send(jsonpCallback + '(' + JSON.stringify(resultToDeliver) + ')');
+      } else {
+        res.status(200).send(resultToDeliver);
+      }
+
     }
 
   });
@@ -240,7 +249,7 @@ app.post('/data', function (req, res) {
 // Route to get the latest sensor data for a given device
 app.get('/data/latest/:deviceId', function (req, res) {
   console.log(getLogTimestamp()+'INFO: Latest sensor data for device '+req.params.deviceId+' requested');
-  getLatestData(req.params.deviceId, res);
+  getLatestData(req.params.deviceId, res, req.query.callback);
 });
 
 // Route to get all sensor data for a given device

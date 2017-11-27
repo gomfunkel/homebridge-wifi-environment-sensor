@@ -25,7 +25,7 @@ Expects a POST request with Content-Type `application/x-www-form-urlencoded` and
 
 `GET /data/latest/{deviceId}`
 
-Gets the latest sensor data for the specified `deviceId` from the database and returns a JSON representation of it. This is primarily called by the [plugin](#plugin).
+Gets the latest sensor data for the specified `deviceId` from the database and returns a JSON representation of it. This is primarily called by the [plugin](#plugin). Using the optional GET parameter `callback` a function name to wrap the response payload can be provided, this can for example be used by JSONP requests.
 
 `GET /data/all/{deviceId}`
 
