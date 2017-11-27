@@ -31,6 +31,10 @@ Gets the latest sensor data for the specified `deviceId` from the database and r
 
 Gets all sensor data for the specified `deviceId` from the database and returns a JSON representation of it. Using the optional GET parameter `callback` a function name to wrap the response payload can be provided, this can for example be used by JSONP requests.
 
+`GET /devices`
+
+Gets a list of all devices available (having sensor data in the database) and returns a JSON representation of it. Using the optional GET parameter `callback` a function name to wrap the response payload can be provided, this can for example be used by JSONP requests.
+
 `DELETE /data/{deviceId}`
 
 Deletes all stored data for the given `deviceId` from the database.

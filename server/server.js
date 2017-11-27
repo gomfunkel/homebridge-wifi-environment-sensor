@@ -151,6 +151,49 @@ function getAllData (deviceId, jsonpCallback, res) {
 }
 
 /**
+ * Get list of all devices available.
+ *
+ * @param [jsonpCallback] Function name for a JSONP callback
+ * @param res             Response object for the HTTP request
+ */
+function getDevices (jsonpCallback, res) {
+
+  // If there is only one parameter, assume that there is no JSONP callback and
+  // the first one being the response object
+  if (res === undefined) {
+    res = jsonpCallback;
+    jsonpCallback = false;
+  }
+
+  db.all("SELECT DISTINCT deviceId FROM "+tableName, function (error, result) {
+
+    if (error) {
+      console.log(getLogTimestamp()+'ERROR: Unable to get list of devices from database');
+      res.status(500).send({});
+    } else if (result === undefined) {
+      console.log(getLogTimestamp()+'ERROR: Could not find any devices');
+      res.status(500).send({});
+    } else {
+      console.log(getLogTimestamp()+'INFO: Delivering list of devices to client');
+
+      var resultsToDeliver = [];
+      for (var i = 0; i < result.length; i++) {
+        resultsToDeliver.push(result[i].deviceid);
+      }
+
+      if (jsonpCallback) {
+        res.status(200).send(jsonpCallback + '(' + JSON.stringify({ 'count': resultsToDeliver.length, 'results': resultsToDeliver }) + ')');
+      } else {
+        res.status(200).send({ 'count': resultsToDeliver.length, 'results': resultsToDeliver });
+      }
+
+    }
+
+  });
+
+}
+
+/**
  * Delete sensor data for a given device from the table.
  */
 function deleteData (deviceId, res) {
@@ -205,6 +248,20 @@ app.get('/data/all/:deviceId', function (req, res) {
     getAllData(req.params.deviceId, req.query.callback, res);
   } else {
     getAllData(req.params.deviceId, res);
+  }
+
+});
+
+// Express route to get a list of all devices available
+app.get('/devices', function (req, res) {
+
+  console.log(getLogTimestamp()+'INFO: Get list of all devices available');
+
+  // Get data for the given device from the database
+  if (req.query.callback) {
+    getDevices(req.query.callback, res);
+  } else {
+    getDevices(res);
   }
 
 });
