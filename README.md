@@ -43,14 +43,14 @@ Deletes all stored data for the given `deviceId` from the database.
 
 The code for the [Homebridge](https://github.com/nfarina/homebridge) plugin which exposes the sensor data to HomeKit. It only provides temperature and humidity information for now as air pressure is not yet a characteristic officially supported by HomeKit. When adding an accessory using this plugin to the Homebridge configuration you have the following configuration options:
 
-`accessory`: (Mandatory) Needs to be "WiFiEnvironmentSensor".
-`name`: (Mandatory) Whatever name you want the accessory to have.
-`endpoint`: (Mandatory) Endpoint for the webservice (see [Server](#server)) to get the sensor data from.
-`deviceId`: (Mandatory) The unique device id for the sensor (as given by the [client](#client) code).
-`manufacturer`: (Optional) Your name or whatever you want to show up in HomeKit as being the manufacturer of the accessory (Defaults to "Acme Corporation").
-`name_temperature`: (Optional) Name for the temperature characteristic (Defaults to "Temperature").
-`name_humidity`: (Optional) Name for the humidity characteristic (Defaults to "Humidity").
-`name_pressure`: (Optional) Name for the air pressure characteristic (Defaults to "Air Pressure" but is not yet used anyway).
+`accessory`: (Mandatory) Needs to be "WiFiEnvironmentSensor".  
+`name`: (Mandatory) Whatever name you want the accessory to have.  
+`endpoint`: (Mandatory) Endpoint for the webservice (see [Server](#server)) to get the sensor data from.  
+`deviceId`: (Mandatory) The unique device id for the sensor (as given by the [client](#client) code).  
+`manufacturer`: (Optional) Your name or whatever you want to show up in HomeKit as being the manufacturer of the accessory (Defaults to "Acme Corporation").  
+`name_temperature`: (Optional) Name for the temperature characteristic (Defaults to "Temperature").  
+`name_humidity`: (Optional) Name for the humidity characteristic (Defaults to "Humidity").  
+`name_pressure`: (Optional) Name for the air pressure characteristic (Defaults to "Air Pressure" but is not yet used anyway).  
 
 A minimal example configuration would thus look like this:
 
