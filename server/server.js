@@ -12,12 +12,20 @@ var tableName = 'sensorData';
 // Port the webservice is listening on
 var serverPort = 3200;
 
+/*****************************************************************************/
+/*** Helpers *****************************************************************/
+/*****************************************************************************/
+
 /**
  * Returns the current timestamp to be used when logging to console.
  */
 function getLogTimestamp () {
   return '['+(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))+'] ';
 }
+
+/*****************************************************************************/
+/*** Functionality ***********************************************************/
+/*****************************************************************************/
 
 /**
  * Initialize the database and set up the system.
@@ -61,6 +69,11 @@ function createTable () {
 
 /**
  * Insert sensor data into the table.
+ *
+ * @param deviceId    Unique ID of the device to add sensor data for
+ * @param temperature The temperature measured in °C
+ * @param humidity    The humidity measured in %
+ * @param pressure    The air pressure measured in hPa
  */
 function insertData (deviceId, temperature, humidity, pressure) {
 
@@ -74,6 +87,9 @@ function insertData (deviceId, temperature, humidity, pressure) {
 
 /**
  * Get latest sensor data for a given device from the table.
+ *
+ * @param deviceId Unique ID of the device to get data for
+ * @param res      Response object for the HTTP request
  */
 function getLatestData (deviceId, res) {
 
@@ -104,17 +120,10 @@ function getLatestData (deviceId, res) {
  * Get all sensor data for a given device from the table.
  *
  * @param deviceId        Unique ID of the device to get data for
- * @param [jsonpCallback] Function name for a JSONP callback
  * @param res             Response object for the HTTP request
+ * @param [jsonpCallback] Function name for a JSONP callback
  */
-function getAllData (deviceId, jsonpCallback, res) {
-
-  // If there are only two parameters, assume that there is no JSONP callback
-  // and the second one being the response object
-  if (res === undefined) {
-    res = jsonpCallback;
-    jsonpCallback = false;
-  }
+function getAllData (deviceId, res, jsonpCallback) {
 
   db.all("SELECT * FROM "+tableName+" WHERE deviceId='"+deviceId+"' ORDER BY timestamp DESC", function (error, result) {
 
@@ -153,17 +162,10 @@ function getAllData (deviceId, jsonpCallback, res) {
 /**
  * Get list of all devices available.
  *
- * @param [jsonpCallback] Function name for a JSONP callback
  * @param res             Response object for the HTTP request
+ * @param [jsonpCallback] Function name for a JSONP callback
  */
-function getDevices (jsonpCallback, res) {
-
-  // If there is only one parameter, assume that there is no JSONP callback and
-  // the first one being the response object
-  if (res === undefined) {
-    res = jsonpCallback;
-    jsonpCallback = false;
-  }
+function getDevices (res, jsonpCallback) {
 
   db.all("SELECT DISTINCT deviceId FROM "+tableName, function (error, result) {
 
@@ -195,6 +197,9 @@ function getDevices (jsonpCallback, res) {
 
 /**
  * Delete sensor data for a given device from the table.
+ *
+ * @param deviceId Unique ID of the device to delete data for
+ * @param res      Response object for the HTTP request
  */
 function deleteData (deviceId, res) {
 
@@ -212,10 +217,14 @@ function deleteData (deviceId, res) {
 
 }
 
+/*****************************************************************************/
+/*** Express Routing *********************************************************/
+/*****************************************************************************/
+
 // Set up express to understand POST params in request bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Express route to post sensor data to
+// Route to post sensor data to
 app.post('/data', function (req, res) {
 
   console.log(getLogTimestamp()+'INFO: Received sensor data from device '+req.body.id+' (Temperature: '+req.body.t+' °C, Humidity: '+req.body.h+' %, Pressure '+req.body.p+' hPa)');
@@ -228,55 +237,34 @@ app.post('/data', function (req, res) {
 
 });
 
-// Express route to get the latest sensor data for a given device
+// Route to get the latest sensor data for a given device
 app.get('/data/latest/:deviceId', function (req, res) {
-
   console.log(getLogTimestamp()+'INFO: Latest sensor data for device '+req.params.deviceId+' requested');
-
-  // Get data for the given device from the database
   getLatestData(req.params.deviceId, res);
-
 });
 
-// Express route to get all sensor data for a given device
+// Route to get all sensor data for a given device
 app.get('/data/all/:deviceId', function (req, res) {
-
   console.log(getLogTimestamp()+'INFO: All sensor data for device '+req.params.deviceId+' requested');
-
-  // Get data for the given device from the database
-  if (req.query.callback) {
-    getAllData(req.params.deviceId, req.query.callback, res);
-  } else {
-    getAllData(req.params.deviceId, res);
-  }
-
+  getAllData(req.params.deviceId, res, req.query.callback);
 });
 
-// Express route to get a list of all devices available
+// Route to get a list of all devices available
 app.get('/devices', function (req, res) {
-
   console.log(getLogTimestamp()+'INFO: Get list of all devices available');
-
-  // Get data for the given device from the database
-  if (req.query.callback) {
-    getDevices(req.query.callback, res);
-  } else {
-    getDevices(res);
-  }
-
+  getDevices(res, req.query.callback);
 });
 
-// Express route to delete historic sensor data for a given device
+// Route to delete historic sensor data for a given device
 app.delete('/data/:deviceId', function (req, res) {
-
   console.log(getLogTimestamp()+'INFO: Deletion of data for device '+req.params.deviceId+' requested');
-
-  // Delete data for the given device from the database
   deleteData(req.params.deviceId, res);
-
 });
 
-// Hey, ho, let's go!
+/*****************************************************************************/
+/*** Hey, ho, let's go! ******************************************************/
+/*****************************************************************************/
+
 http.listen(serverPort, function () {
 
   // Initialize the database
